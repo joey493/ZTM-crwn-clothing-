@@ -1,3 +1,13 @@
 @use './pages';
 @use './components';
 @use './base';
+@use './layout';
+
+body {
+    padding: 20px 60px;
+}
+
+a {
+color: black;
+text-decoration: none;
+}
