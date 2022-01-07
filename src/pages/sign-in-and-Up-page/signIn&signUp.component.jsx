@@ -1,5 +1,5 @@
 import SignIn from "../../components/sign-in/sign-in.component"
-import SignUp from "../../components/sign-up/sign-up.component"
+import SignUp from "../../sign-up/sign-up.component"
 import './signIn&signUp.styles.scss'
 
 const SignInAndSignUp = () => {

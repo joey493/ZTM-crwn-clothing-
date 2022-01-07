@@ -1,5 +1,6 @@
 import { Component } from 'react'
-import { googlSignIn } from '../../firebase/firebase.utils.js';
+import { googlSignIn, auth } from '../../firebase/firebase.utils.js';
+import { signInWithEmailAndPassword } from 'firebase/auth';
 import FormInput from '../form-input/form-input.component';
 import CustomBtn from '../custom-btn/custom-btn.component';
 import './sign-in.styles.scss'
@@ -13,8 +14,17 @@ class SignIn extends Component {
         }
     }
 
-    handleSubmit = (e) => {
+    handleSubmit = async (e) => {
         e.preventDefault()
+        const { email, password } = this.state;
+
+        try {
+            await signInWithEmailAndPassword(auth, email, password)
+            this.setState({ email: '', password: '' })
+        } catch (error) {
+            console.error(error)
+        }
+
     }
 
     handleInputChange = (e) => {
