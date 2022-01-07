@@ -1,30 +1,61 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
 import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
-
-// import { getAnalytics } from "firebase/analytics";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-    apiKey: "AIzaSyAzLNE0GXxVH2me_DWUG7PQfAJKpFoL7SM",
-    authDomain: "crwn-db-8bdf6.firebaseapp.com",
-    projectId: "crwn-db-8bdf6",
-    storageBucket: "crwn-db-8bdf6.appspot.com",
-    messagingSenderId: "359262434782",
-    appId: "1:359262434782:web:ddc45bf57268bff0b9594f",
-    measurementId: "G-HPP4G0HWJL"
+    apiKey: "AIzaSyDQHWERL0urhfyBTSYT61kq3jBFZx1ulZI",
+    authDomain: "db-crwn-24efa.firebaseapp.com",
+    projectId: "db-crwn-24efa",
+    storageBucket: "db-crwn-24efa.appspot.com",
+    messagingSenderId: "739253984609",
+    appId: "1:739253984609:web:3554c6fc6eb1b651e23920"
 };
 
 // Initialize Firebase
 initializeApp(firebaseConfig);
-// const analytics = getAnalytics(app);
 
-// google sign-in
+// Initialize firestore
+const firestore = getFirestore()
+
+// Initialize auth
 export const auth = getAuth()
+
+
+// save user => create user profile
+export const createUserProfileDocument = async (userAuth, additionData) => {
+    // make sure that user is existed
+    if (!userAuth) return;
+
+    const userRef = doc(firestore, `users/${userAuth.uid}`) // create new Doc
+
+    // get document data
+    const snapShot = await getDoc(userRef)
+
+    if(!snapShot.exists()) {
+        const {displayName, email } = userAuth
+        const createdAt = new Date()
+
+        try { // set new doc data and save it 
+            await setDoc(userRef, {
+                displayName,
+                email,
+                createdAt,
+                ...additionData
+            })
+        } catch(error) {
+            console.log('error at creating users', error)
+        }
+    }
+
+    return snapShot
+}
+
+// google sign in
 const provider = new GoogleAuthProvider()
 provider.setCustomParameters({prompt: 'select_account'});
 
