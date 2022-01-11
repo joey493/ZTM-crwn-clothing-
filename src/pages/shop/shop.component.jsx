@@ -11,7 +11,7 @@ export class ShopPage extends Component {
     }
     render() {
         const { collections } = this.state
-        console.log(this.state)
+
         return (
             <div className='shop-page'>
                 {collections.map(({ id, ...OtherProps }) => (
