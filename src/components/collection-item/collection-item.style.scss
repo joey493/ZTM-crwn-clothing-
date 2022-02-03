@@ -16,10 +16,10 @@
 
     .custom-button {
         width: 80%;
-        opacity: .7;
+        opacity: 0.7;
         position: absolute;
         top: 225px;
-        display: none
+        display: none;
     }
 
     .collection-footer {
@@ -30,21 +30,21 @@
         font-size: 18px;
 
         .name {
-        width: 90%;
-        margin-bottom: 15px;
+            width: 90%;
+            margin-bottom: 15px;
         }
 
         .price {
-        width: 10%;
+            width: 10%;
         }
     }
 
     &:hover {
         .image {
-            opacity: .8;
+            opacity: 0.8;
         }
         .custom-button {
-            opacity: .85;
+            opacity: 0.85;
             display: block;
         }
     }

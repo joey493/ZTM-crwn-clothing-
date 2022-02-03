@@ -1,62 +1,82 @@
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-import { doc, getDoc, getFirestore, setDoc } from 'firebase/firestore'
-import { getAuth, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
+import firebase from 'firebase/app';
+import 'firebase/firestore';
+import 'firebase/auth';
 
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
-
-// Your web app's Firebase configuration
-const firebaseConfig = {
-    apiKey: "AIzaSyDQHWERL0urhfyBTSYT61kq3jBFZx1ulZI",
-    authDomain: "db-crwn-24efa.firebaseapp.com",
-    projectId: "db-crwn-24efa",
-    storageBucket: "db-crwn-24efa.appspot.com",
-    messagingSenderId: "739253984609",
-    appId: "1:739253984609:web:3554c6fc6eb1b651e23920"
+const config = {
+    apiKey: 'AIzaSyCdHT-AYHXjF7wOrfAchX4PIm3cSj5tn14',
+    authDomain: 'crwn-db.firebaseapp.com',
+    databaseURL: 'https://crwn-db.firebaseio.com',
+    projectId: 'crwn-db',
+    storageBucket: 'crwn-db.appspot.com',
+    messagingSenderId: '850995411664',
+    appId: '1:850995411664:web:7ddc01d597846f65',
 };
 
-// Initialize Firebase
-initializeApp(firebaseConfig);
+firebase.initializeApp(config);
 
-// Initialize firestore
-const firestore = getFirestore()
-
-// Initialize auth
-export const auth = getAuth()
-
-
-// save user => create user profile
-export const createUserProfileDocument = async (userAuth, additionData) => {
-    // make sure that user is existed
+export const createUserProfileDocument = async (userAuth, additionalData) => {
     if (!userAuth) return;
 
-    const userRef = doc(firestore, `users/${userAuth.uid}`) // create new Doc
+    const userRef = firestore.doc(`users/${userAuth.uid}`);
 
-    // get document data
-    const snapShot = await getDoc(userRef)
+    const snapShot = await userRef.get();
 
-    if(!snapShot.exists()) {
-        const {displayName, email } = userAuth
-        const createdAt = new Date()
-
-        try { // set new doc data and save it 
-            await setDoc(userRef, {
+    if (!snapShot.exists) {
+        const { displayName, email } = userAuth;
+        const createdAt = new Date();
+        try {
+            await userRef.set({
                 displayName,
                 email,
                 createdAt,
-                ...additionData
-            })
-        } catch(error) {
-            console.log('error at creating users', error)
+                ...additionalData,
+            });
+        } catch (error) {
+            console.log('error creating user', error.message);
         }
     }
 
-    return snapShot
-}
+    return userRef;
+};
 
-// google sign in
-const provider = new GoogleAuthProvider()
-provider.setCustomParameters({prompt: 'select_account'});
+export const addCollectionAndDocuments = async (
+    collectionKey,
+    objectsToAdd
+) => {
+    const collectionRef = firestore.collection(collectionKey);
 
-export const googlSignIn = () => signInWithPopup(auth, provider)
+    const batch = firestore.batch();
+    objectsToAdd.forEach((obj) => {
+        const newDocRef = collectionRef.doc();
+        batch.set(newDocRef, obj);
+    });
+
+    return await batch.commit();
+};
+
+export const convertCollectionsSnapshotToMap = (collections) => {
+    const transformedCollection = collections.docs.map((doc) => {
+        const { title, items } = doc.data();
+
+        return {
+            routeName: encodeURI(title.toLowerCase()),
+            id: doc.id,
+            title,
+            items,
+        };
+    });
+
+    return transformedCollection.reduce((accumulator, collection) => {
+        accumulator[collection.title.toLowerCase()] = collection;
+        return accumulator;
+    }, {});
+};
+
+export const auth = firebase.auth();
+export const firestore = firebase.firestore();
+
+const provider = new firebase.auth.GoogleAuthProvider();
+provider.setCustomParameters({ prompt: 'select_account' });
+export const signInWithGoogle = () => auth.signInWithPopup(provider);
+
+export default firebase;
